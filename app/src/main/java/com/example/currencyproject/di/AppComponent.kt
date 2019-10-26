@@ -5,7 +5,10 @@ import com.example.currencyproject.screens.BaseActivity
 import com.example.currencyproject.screens.currencyList.CurrencyListActivity
 import dagger.Component
 
-@Component(modules = arrayOf(NetworkModule::class,DataBaseModule::class, RepoModule::class, ViewModelsModule::class, ApplicationModule::class))
+@Component(modules = arrayOf(
+    NetworkModule::class, DataBaseModule::class, RepoModule::class,
+    ViewModelsModule::class, ApplicationModule::class, ConverterModule::class
+    ))
 interface AppComponent {
     fun inject(activity: CurrencyListActivity)
     // Question for reviewer:

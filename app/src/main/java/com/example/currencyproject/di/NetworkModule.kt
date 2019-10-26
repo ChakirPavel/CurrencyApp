@@ -3,6 +3,7 @@ package com.example.currencyproject.di
 import android.app.Application
 import android.content.Context
 import com.example.currencyproject.App
+import com.example.currencyproject.BuildConfig
 import com.example.currencyproject.services.NetworkManager
 import com.example.currencyproject.services.NetworkService
 import dagger.Module
@@ -19,7 +20,7 @@ class NetworkModule {
     @Provides
     internal fun provideNetworkService(): NetworkService {
         val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl("https://sbertest.glitch.me/")
+            .baseUrl(BuildConfig.SERVER_ENDPOINT)
             .addConverterFactory(GsonConverterFactory.create())
             .client(OkHttpClient.Builder().build())
             .build()

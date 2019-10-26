@@ -35,7 +35,7 @@ class CurrencyRepo(private val networkManager: NetworkManager, val networkServic
     {
         fun getData(): Observable<CurrencyInfo> {
             var arrayList = CurrencyInfo("First from remote", "Owner 1", ArrayMap<String, Double>())
-            return Observable.just(arrayList).delay(2, TimeUnit.SECONDS)
+            return Observable.just(arrayList)
         }
 
         fun setData()
