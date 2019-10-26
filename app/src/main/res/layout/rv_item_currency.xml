@@ -4,12 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
-        <import type="android.view.View" />
-
         <variable
-            name="currencyInfo"
-            type="com.example.currencyproject.models.CurrencyInfo" />
+            name="currency"
+            type="com.example.currencyproject.adapters.ListCurrencyAdapter.CurrencyItem" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -30,7 +27,7 @@
                 android:textSize="24sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="USD" />
+                android:text="@{currency.currencyName}" />
 
             <TextView
                 android:id="@+id/txtCurrencyInfo"
@@ -38,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="US Dollar"
+                android:text="@{currency.currencyFullName}"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -49,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:text="22.96"
+                android:text="@{currency.currencyValue}"
                 android:textSize="24sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

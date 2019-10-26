@@ -1,6 +1,5 @@
 package com.example.currencyproject.screens.currencyList
 
-import android.app.Application
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -8,7 +7,6 @@ import android.util.ArrayMap
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.Observable
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.currencyproject.App
 import com.example.currencyproject.R
@@ -26,7 +24,7 @@ class CurrencyListActivity : BaseActivity(), ListCurrencyAdapter.OnItemClickList
     lateinit var currencyListViewModel: CurrencyListViewModel
 
     lateinit var binding : ActivityCurrencyListBinding
-    val mainHandler = Handler(Looper.getMainLooper())
+    val updateCurrencyHandler = Handler(Looper.getMainLooper())
     val adapter = ListCurrencyAdapter(ArrayMap<String, Double>(), this );
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,14 +48,13 @@ class CurrencyListActivity : BaseActivity(), ListCurrencyAdapter.OnItemClickList
         currencyListViewModel.currencyInfo.observe(this,
             Observer<CurrencyInfo> { it?.let{ adapter.updateList(it.rates) } })
 
-
         // endregion
 
         // I will stop it after onStop, if need.
-        mainHandler.post(object : Runnable {
+        updateCurrencyHandler.post(object : Runnable {
             override fun run() {
                 currencyListViewModel.loadCurrencys();
-                mainHandler.postDelayed(this, 2000)
+                updateCurrencyHandler.postDelayed(this, 2000)
             }
         })
     }
