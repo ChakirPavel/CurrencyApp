@@ -1,19 +1,28 @@
 package com.example.currencyproject.di
 
+import android.app.Application
+import android.content.Context
 import com.example.currencyproject.repositories.CurrencyRepo
 import com.example.currencyproject.screens.BaseActivity
 import com.example.currencyproject.screens.currencyList.CurrencyListActivity
 import dagger.Component
+import dagger.Module
+import dagger.Provides
 
 @Component(modules = arrayOf(
-    NetworkModule::class, DataBaseModule::class, RepoModule::class,
-    ViewModelsModule::class, ApplicationModule::class, ConverterModule::class
-    ))
+    NetworkModule::class,       DataBaseModule::class,      RepoModule::class,
+    ViewModelsModule::class,    ApplicationModule::class,   ConverterModule::class,
+    RouterModule::class
+))
+
 interface AppComponent {
     fun inject(activity: CurrencyListActivity)
-    // Question for reviewer:
-    // If we use BaseActivity, all injects doesn't work.
-    // Dagger understood what field we need inject from struct class, correct?
-    // How we will create universal method for inject?
-    // Or it's normal write fun for every activity?
+}
+
+@Module
+class ApplicationModule(private val application: Application) {
+    @Provides
+    fun provideContext(): Context {
+        return application
+    }
 }

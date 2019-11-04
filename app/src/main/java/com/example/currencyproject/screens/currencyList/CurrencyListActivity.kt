@@ -12,8 +12,10 @@ import com.example.currencyproject.App
 import com.example.currencyproject.R
 import com.example.currencyproject.adapters.ListCurrencyAdapter
 import com.example.currencyproject.databinding.ActivityCurrencyListBinding
-import com.example.currencyproject.models.CurrencyInfo
+import com.example.currencyproject.repositories.RoomDAO.DataBaseRoom
+import com.example.currencyproject.repositories.models.CurrencyInfo
 import com.example.currencyproject.screens.BaseActivity
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class CurrencyListActivity : BaseActivity(), ListCurrencyAdapter.OnItemClickListener {
@@ -22,9 +24,19 @@ class CurrencyListActivity : BaseActivity(), ListCurrencyAdapter.OnItemClickList
 
     @Inject
     lateinit var currencyListViewModel: CurrencyListViewModel
-
     lateinit var binding : ActivityCurrencyListBinding
-    val updateCurrencyHandler = Handler(Looper.getMainLooper())
+    lateinit var updateCurrencyHandler: Handler
+
+
+
+    val updateCurrencyTask = object : Runnable {
+        override fun run() {
+            currencyListViewModel.loadCurrencys()
+            updateCurrencyHandler.postDelayed(this, 2000)
+        }
+    }
+
+
     val adapter = ListCurrencyAdapter(ArrayMap<String, Double>(), this );
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,17 +58,28 @@ class CurrencyListActivity : BaseActivity(), ListCurrencyAdapter.OnItemClickList
             }
         })
         currencyListViewModel.currencyInfo.observe(this,
-            Observer<CurrencyInfo> { it?.let{ adapter.updateList(it.rates) } })
+            Observer<CurrencyInfo> { it?.let{
+                adapter.updateList(it.rates)
+                binding.executePendingBindings()
+            }
+        })
 
         // endregion
 
-        // I will stop it after onStop, if need.
-        updateCurrencyHandler.post(object : Runnable {
-            override fun run() {
-                currencyListViewModel.loadCurrencys();
-                updateCurrencyHandler.postDelayed(this, 2000)
-            }
-        })
+        updateCurrencyHandler = Handler(Looper.getMainLooper())
+
+
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateCurrencyHandler.post(updateCurrencyTask)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        updateCurrencyHandler.removeCallbacks(updateCurrencyTask)
     }
 
 
