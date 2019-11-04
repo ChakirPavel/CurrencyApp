@@ -1,58 +1,57 @@
 package com.example.currencyproject.repositories
 
+import android.content.Context
 import android.util.ArrayMap
-import android.util.Log
-import com.example.currencyproject.models.CurrencyInfo
-import com.example.currencyproject.services.NetworkManager
+import com.example.currencyproject.repositories.RoomDAO.CurrencyDAO
+import com.example.currencyproject.repositories.RoomDAO.DataBaseRoom
+import com.example.currencyproject.repositories.models.CurrencyInfo
+import com.example.currencyproject.services.AlertService
 import com.example.currencyproject.services.NetworkService
-import io.reactivex.Observable
-import io.reactivex.Single
-import org.jetbrains.anko.doAsync
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.util.concurrent.TimeUnit
+import com.example.currencyproject.services.checkConnection
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.util.*
 
-class CurrencyRepo(private val networkManager: NetworkManager, val networkService: NetworkService) {
+class CurrencyRepo(private val alertController: AlertService,
+                   private val networkService: NetworkService,
+                   private val context: Context,
+                   private val currencyDAO: CurrencyDAO) {
 
-    private val localDataSource = CurrencyLocalRepo()
-    private val remoteDataSource = CurrencyRemoteRepo()
-    // I'm not sure about best way.
-    // I will create one repo IRepositories and recreate it when connection is lost. Which is good practice?
-
-    fun getCurrencys(callBack: Callback<CurrencyInfo>) {
-        if (networkManager.isConnectedToInternet()) {
-            remoteDataSource.getData().enqueue(callBack)
+    fun getLocalCurrencys(): CurrencyInfo {
+        lateinit var info: CurrencyInfo
+        runBlocking {
+            info = currencyDAO.getInfo()
         }
-        else {
-            // Not completed.
-            // Get data from local database.
-        }
+        if(info == null)
+            info = CurrencyInfo("RUB", Calendar.getInstance().time.toString(), ArrayMap())
+
+        return info
     }
 
-
-    private inner class CurrencyLocalRepo //: IRepositories<CurrencyInfo>
-    {
-        fun getData(): Observable<CurrencyInfo> {
-            var arrayList = CurrencyInfo("First from remote", "Owner 1", ArrayMap<String, Double>())
-            return Observable.just(arrayList)
+    private fun getRemoteCurrencys(): CurrencyInfo {
+        lateinit var info: CurrencyInfo
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                var response = networkService.GetCurrencys().execute()
+                if (response.isSuccessful && response.errorBody() == null) {
+                    info = response.body()!!
+                    info.date = Calendar.getInstance().time.toString()
+                    currencyDAO.insert(info)
+                } else {
+                    alertController.ShowMessageDialog(response.errorBody().toString())
+                }
+            }
         }
 
-        fun setData()
-        {
-            //Save Data
-        }
+        return info;
     }
 
-    private inner class CurrencyRemoteRepo //: IRepositories<CurrencyInfo>
-     {
-        fun getData() : Call<CurrencyInfo> {
-            return networkService.GetCurrencys()
-        }
+    fun getCurrencys(): CurrencyInfo {
+        if(networkService.checkConnection(context))
+            return getRemoteCurrencys()
+        else
+            return getLocalCurrencys()
     }
 }
-
-// Only for practice
-//interface IRepositories<T> {
-//    fun getData(): Observable<T>
-//}

@@ -2,15 +2,10 @@ package com.example.currencyproject.adapters
 
 import android.util.ArrayMap
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.currencyproject.databinding.RvItemCurrencyBinding
-import com.example.currencyproject.models.CurrencyInfo
-import java.text.DecimalFormat
 import java.util.*
-import androidx.databinding.DataBindingUtil
-
 
 
 class ListCurrencyAdapter(private var items: ArrayMap<String, Double>,

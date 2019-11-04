@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import com.example.currencyproject.App
 import com.example.currencyproject.BuildConfig
-import com.example.currencyproject.services.NetworkManager
 import com.example.currencyproject.services.NetworkService
 import dagger.Module
 import dagger.Provides
@@ -18,7 +17,7 @@ import javax.inject.Singleton
 class NetworkModule {
 
     @Provides
-    internal fun provideNetworkService(): NetworkService {
+    internal fun provideNetworkService(context: Context): NetworkService {
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl(BuildConfig.SERVER_ENDPOINT)
             .addConverterFactory(GsonConverterFactory.create())
